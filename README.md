@@ -1,5 +1,6 @@
-# Project Name
-The idea of this is to make an application with presents stock market informations to it's users.
+# Networking
+This repository contains TCP, UDP and SCTP clients and servers implementations.
+
 
 ## Table of contents
 * [General info](#general-info)
@@ -9,24 +10,18 @@ The idea of this is to make an application with presents stock market informatio
 * [Features](#features)
 * [Status](#status)
 * [Inspiration](#inspiration)
-* [Contact](#contact)
+
 
 ## General info
 There will be more here, stay tuned!
 
+
 ## Screenshots
 There will be more here, stay tuned!
 
-## Technologies
-* .NET 5.0 version 5.0.5
-* Entity Framework Core version 6.0.0
-* Sqlite version 6.0.0
-* REST API 
-* React Typescript
 
-* Visual Studio Code
-* Visual Studio 
-* JetBrains Rider
+## Technologies
+* csc 4.8.4084.0
 
 
 ## Setup
@@ -46,9 +41,7 @@ There will be more here, stay tuned!
 
 
 ## Status
-Project is: _in progress_, we are working on the registration
+Project is: _in progress_
 
 ## Inspiration
 Selfdevelopment
-
-## Contact
