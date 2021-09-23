@@ -32,45 +32,59 @@ namespace UdpServer
                 {
                     server.Bind(localEndPoint);
         
+                    Console.WriteLine("Established server: " + server.LocalEndPoint);
                     Console.WriteLine("Waiting for datagrams...");
-                    
+
                     while (true)
                     {
-                        int bytesRec = server.ReceiveFrom(dataBuffer, ref senderRemote);;
-                        receivedMessage += Encoding.ASCII.GetString(dataBuffer, 0, bytesRec);
-                        if (receivedMessage.IndexOf("<EOF>") > -1)
+                        while (true)
+                        {
+                            int bytesRec = server.ReceiveFrom(dataBuffer, ref senderRemote);
+                            receivedMessage = Encoding.ASCII.GetString(dataBuffer, 0, bytesRec);
+                            
+                            Console.WriteLine("Received message: {0}", receivedMessage);
+                            
+                            if (receivedMessage.IndexOf("<EOF>") > -1)
+                            {
+                                break;
+                            }
+                        }
+
+                        byte[] response = Encoding.ASCII.GetBytes(DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                        server.SendTo(response, senderRemote);
+                        
+                        if (receivedMessage.Equals("<EOF>"))
                         {
                             break;
                         }
                     }
-                    
-                    Console.WriteLine("Received message: {0}", receivedMessage);
-                    
-                    byte[] response = Encoding.ASCII.GetBytes(DateTime.Now.ToString(CultureInfo.InvariantCulture));
-                    server.SendTo(response, senderRemote);
-                    
+
+                    Console.WriteLine("Closing server: " + server.LocalEndPoint);
                     server.Close();
                 }
                 catch (ArgumentNullException ane)
                 {
                     server.Close();
-                    Console.WriteLine("ArgumentNullException : {ane}", ane.ToString());
+                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
                 }
                 catch (SocketException se)
                 {
                     server.Close();
-                    Console.WriteLine("SocketException : {se}", se.ToString());
+                    Console.WriteLine("SocketException : {0}", se.ToString());
                 }
                 catch (Exception e)
                 {
                     server.Close();
-                    Console.WriteLine("Unexpected exception : {e}", e.ToString());
+                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
+            
+            Console.WriteLine("\nPress ENTER to continue...");  
+            Console.Read();
         }
     }
 }
