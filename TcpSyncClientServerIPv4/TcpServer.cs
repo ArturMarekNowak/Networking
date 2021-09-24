@@ -17,57 +17,80 @@ namespace TcpServer
             
             //Data buffer
             String receivedMessage = null;
-            byte[] dataBUffer = new Byte[1024];
-            
-            //Starting the listener
-            Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            byte[] dataBuffer = new Byte[1024];
+            byte[] response;
 
             try
             {
-                //Binding and setting up the connection queue to ten
-                listener.Bind(localEndPoint);
-                listener.Listen(10);
 
-                //Beginning of listening
-                while (true)
+                //Starting the listener
+                Socket server = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+                try
                 {
-                    Console.WriteLine("Listening...");
+                    //Binding and setting up the connection queue to ten
+                    server.Bind(localEndPoint);
+                    server.Listen(10);
 
-                    //Suspending program while waiting for incoming connection
-                    Socket handler = listener.Accept();
+                    Console.WriteLine("Established server: " + server.LocalEndPoint);
+                    Console.WriteLine("Waiting for datagrams...");
 
-                    receivedMessage = null;
-
+                    //Beginning of listening
                     while (true)
                     {
-                        int bytesRec = handler.Receive(dataBUffer);
-                        receivedMessage += Encoding.ASCII.GetString(dataBUffer, 0, bytesRec);
-                        if (receivedMessage.IndexOf("<EOF>") > -1)
-                        {
-                            break;
-                        }
+                        Console.WriteLine("Listening...");
+
+                        //Suspending program while waiting for incoming connection
+                        Socket handler = server.Accept();
                         
+                        receivedMessage = null;
+
+                        while (true)
+                        {
+                            int bytesRec = handler.Receive(dataBuffer);
+                            receivedMessage = Encoding.ASCII.GetString(dataBuffer, 0, bytesRec);
+
+                            Console.WriteLine("Received message : {0}", receivedMessage);
+
+                            if (receivedMessage.Equals("<EOF>"))
+                            {
+                                response = Encoding.ASCII.GetBytes("Closing connection");
+                                handler.Send(response);
+                                break;
+                            }
+                            
+                            if (receivedMessage.IndexOf("<EOF>") > -1)
+                            {
+                                response = Encoding.ASCII.GetBytes(DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                                handler.Send(response);
+                            }
+                        }
+
+                        handler.Shutdown(SocketShutdown.Both);
+                        handler.Close();
+
+                        break;
                     }
-
-                    Console.WriteLine("Message received : {0}", receivedMessage);
-
-                    byte[] response = Encoding.ASCII.GetBytes(DateTime.Now.ToString(CultureInfo.InvariantCulture));
-
-                    handler.Send(response);
-                    handler.Shutdown(SocketShutdown.Both);
-                    handler.Close();
+                }
+                catch (ArgumentNullException ane)
+                {
+                    server.Close();
+                    Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                }
+                catch (SocketException se)
+                {
+                    server.Close();
+                    Console.WriteLine("SocketException : {0}", se.ToString());
+                }
+                catch (Exception e)
+                {
+                    server.Close();
+                    Console.WriteLine("Unexpected exception : {0}", e.ToString());
                 }
             }
             catch (Exception e)
             {
-                listener.Close();
                 Console.WriteLine(e.ToString());
-                Console.WriteLine("Closed the server");
-            }
-            finally
-            {
-                listener.Close();
-                Console.WriteLine("Closed the server");
             }
         }
     

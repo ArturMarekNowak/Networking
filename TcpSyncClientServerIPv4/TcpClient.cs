@@ -17,42 +17,55 @@ namespace TcpClient
 
             //Data buffer
             byte[] dataBuffer = new Byte[1024];
+            byte[] message, response;
+            string userMessage;
+            int bytesRec;
 
             // Connect to a remote device.  
             try
             {
                 //Starting the sender
-                Socket sender = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                Socket client = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                 try
                 {
-                    sender.Connect(serverEndPoint);
+                    client.Connect(serverEndPoint);
+                    
+                    Console.WriteLine("Connected successfully to: " + client.RemoteEndPoint);
+                    Console.WriteLine("Established client: " + client.LocalEndPoint);
+                    Console.WriteLine("You can send messages now...");
+                    
+                    while ((userMessage = Console.ReadLine()) != "quit")
+                    {
+                        message = Encoding.ASCII.GetBytes(userMessage + "<EOF>");
+                        client.Send(message);
 
-                    Console.WriteLine("Connected successfully to {0}", sender.RemoteEndPoint);
+                        bytesRec = client.Receive(dataBuffer);
+                        Console.WriteLine("Server response: {0}", Encoding.ASCII.GetString(dataBuffer, 0, bytesRec));
+                    }
+                    
+                    message = Encoding.ASCII.GetBytes("<EOF>");
+                    client.Send(message);
 
-                    byte[] message = Encoding.ASCII.GetBytes("This is a test<EOF>");
-                    int bytesSent = sender.Send(message);
-
-                    int bytesRec = sender.Receive(dataBuffer);
+                    bytesRec = client.Receive(dataBuffer);
                     Console.WriteLine("Server response: {0}", Encoding.ASCII.GetString(dataBuffer, 0, bytesRec));
 
-                    sender.Shutdown(SocketShutdown.Both);
-                    sender.Close();
-
+                    client.Shutdown(SocketShutdown.Both);
+                    client.Close();
                 }
                 catch (ArgumentNullException ane)
                 {
-                    sender.Close();
+                    client.Close();
                     Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
                 }
                 catch (SocketException se)
                 {
-                    sender.Close();
+                    client.Close();
                     Console.WriteLine("SocketException : {0}", se.ToString());
                 }
                 catch (Exception e)
                 {
-                    sender.Close();
+                    client.Close();
                     Console.WriteLine("Unexpected exception : {0}", e.ToString());
                 }
             }
