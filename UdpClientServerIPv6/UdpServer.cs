@@ -4,73 +4,63 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace TcpServer
+namespace UdpServer
 {
     class Program
-    { 
+    {
         public static void Main(string[] args)
         {
             //Socket specification
             int port = 13;
-            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");  
+            IPAddress ipAddress = IPAddress.Parse("::1");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
+
+            IPEndPoint sender = new IPEndPoint(IPAddress.IPv6Any, 0);
+            EndPoint senderRemote = (EndPoint) sender;
             
             //Data buffer
             String receivedMessage = null;
             byte[] dataBuffer = new Byte[1024];
-            byte[] response;
 
+            // Connect to a remote device.  
             try
             {
-
-                //Starting the listener
-                Socket server = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                //Starting the sender
+                Socket server = new Socket(ipAddress.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
 
                 try
                 {
-                    //Binding and setting up the connection queue to ten
                     server.Bind(localEndPoint);
-                    server.Listen(10);
-
+        
                     Console.WriteLine("Established server: " + server.LocalEndPoint);
                     Console.WriteLine("Waiting for datagrams...");
 
-                    //Beginning of listening
                     while (true)
                     {
-                        Console.WriteLine("Listening...");
-
-                        //Suspending program while waiting for incoming connection
-                        Socket handler = server.Accept();
-                        
-                        receivedMessage = null;
-
                         while (true)
                         {
-                            int bytesRec = handler.Receive(dataBuffer);
+                            int bytesRec = server.ReceiveFrom(dataBuffer, ref senderRemote);
                             receivedMessage = Encoding.ASCII.GetString(dataBuffer, 0, bytesRec);
-
-                            Console.WriteLine("Received message : {0}", receivedMessage);
-
-                            if (receivedMessage.Equals("<EOF>"))
-                            {
-                                response = Encoding.ASCII.GetBytes("Closing connection");
-                                handler.Send(response);
-                                break;
-                            }
+                            
+                            Console.WriteLine("Received message: {0}", receivedMessage);
                             
                             if (receivedMessage.IndexOf("<EOF>") > -1)
                             {
-                                response = Encoding.ASCII.GetBytes(DateTime.Now.ToString(CultureInfo.InvariantCulture));
-                                handler.Send(response);
+                                break;
                             }
                         }
 
-                        handler.Shutdown(SocketShutdown.Both);
-                        handler.Close();
-
-                        break;
+                        byte[] response = Encoding.ASCII.GetBytes(DateTime.Now.ToString(CultureInfo.InvariantCulture));
+                        server.SendTo(response, senderRemote);
+                        
+                        if (receivedMessage.Equals("<EOF>"))
+                        {
+                            break;
+                        }
                     }
+
+                    Console.WriteLine("Closing server: " + server.LocalEndPoint);
+                    server.Close();
                 }
                 catch (ArgumentNullException ane)
                 {
@@ -92,10 +82,9 @@ namespace TcpServer
             {
                 Console.WriteLine(e.ToString());
             }
-			
-			Console.WriteLine("\nPress ENTER to continue...");  
-			Console.Read();
+            
+            Console.WriteLine("\nPress ENTER to continue...");  
+            Console.Read();
         }
-    
     }
 }
