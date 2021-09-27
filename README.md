@@ -1,5 +1,5 @@
 # Networking
-This repository contains TCP, UDP and SCTP clients and servers implementations.
+This repository contains TCP and UDP clients and servers implementations.
 
 
 ## Table of contents
@@ -44,4 +44,4 @@ There will be more here, stay tuned!
 Project is: _in progress_
 
 ## Inspiration
-Selfdevelopment
+Network programming classes at AGH University of Science and Technology
