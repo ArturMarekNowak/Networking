@@ -25,8 +25,15 @@ There will be more here, stay tuned!
 
 
 ## Setup
-There will be more here, stay tuned!
+Provided that you have make and csc all you need to do is to change the directory to the desired one for example:
 
+`cd TcpSyncClientServerIPv4`\
+
+and run make:
+
+`make all`
+
+make will run csc and .exe files will appear in your directory
 
 ## Code Examples
 There will be more here, stay tuned!
