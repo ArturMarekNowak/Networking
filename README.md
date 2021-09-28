@@ -27,7 +27,7 @@ There will be more here, stay tuned!
 ## Setup
 Provided that you have make and csc all you need to do is to change the directory to the desired one for example:
 
-`cd TcpSyncClientServerIPv4`\
+`cd TcpSyncClientServerIPv4`
 
 and run make:
 
