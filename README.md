@@ -43,9 +43,13 @@ There will be more here, stay tuned!
 There will be more here, stay tuned!
 
 
-To-do list:
-There will be more here, stay tuned!
-
+## To-do list:
+* SMTP
+* FTP
+* Netstat
+* Ping
+* NTP
+* RFC3091
 
 ## Status
 Project is: _in progress_
