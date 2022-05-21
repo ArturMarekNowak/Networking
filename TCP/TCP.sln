@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServer", "TcpServer\TcpS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientOne", "TcpClientOne\TcpClientOne.csproj", "{5F473DBC-A8F3-403D-B338-9F7B39F6D329}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientTwo", "TcpClientTwo\TcpClientTwo.csproj", "{C6801BBF-4DEC-4123-A379-28F7EB54F24B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{5F473DBC-A8F3-403D-B338-9F7B39F6D329}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F473DBC-A8F3-403D-B338-9F7B39F6D329}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F473DBC-A8F3-403D-B338-9F7B39F6D329}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6801BBF-4DEC-4123-A379-28F7EB54F24B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6801BBF-4DEC-4123-A379-28F7EB54F24B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6801BBF-4DEC-4123-A379-28F7EB54F24B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6801BBF-4DEC-4123-A379-28F7EB54F24B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

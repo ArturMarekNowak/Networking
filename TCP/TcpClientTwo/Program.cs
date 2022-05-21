@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace TCP
 {
-    public sealed class TcpClientOne
+    public sealed class TcpClientTwo
     {
         public static async Task Main()
         {
             var ipAddress = IPAddress.Parse("127.0.0.1");
-            var ipEndpoint = new IPEndPoint(ipAddress, 12346);
+            var ipEndpoint = new IPEndPoint(ipAddress, 12347);
             var tcpClient = new TcpClient(ipEndpoint);
         
             await tcpClient.ConnectAsync(ipAddress, 12345);

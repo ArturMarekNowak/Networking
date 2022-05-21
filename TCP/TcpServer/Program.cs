@@ -1,74 +1,65 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-class TcpServer
+namespace TCP
 {
-    public static void Main()
+    public sealed class TcpServer
     {
-        IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
-        var ipEndpoint = new IPEndPoint(ipAddress, 12345);
-        var tcpServer = new TcpListener(ipEndpoint);
-        
-        tcpServer.Start();
-        
-        Console.Write("Waiting for a connection... ");
-        
-        TcpClient client = tcpServer.AcceptTcpClient();            
-        Console.WriteLine("Connected!");
-        
-        TaskFactory taskFactory = new TaskFactory();
-        var tokenSource = new CancellationTokenSource();
-        CancellationToken cancellationToken = tokenSource.Token;
-        
-        var taskArray = new Task[2];
-        taskArray[0] = taskFactory.StartNew(() => ReadingThread(client, cancellationToken));
-        taskArray[1] = taskFactory.StartNew(() => SendingThread(client, cancellationToken));
-
-        Console.WriteLine("HereHere");
-        
-        while (!(Console.ReadLine() == "q"))
+        public static async Task Main()
         {
-            tokenSource.Cancel();
-        }
+            var ipAddress = IPAddress.Parse("127.0.0.1");
+            var ipEndpoint = new IPEndPoint(ipAddress, 12345);
+            var tcpServer = new TcpListener(ipEndpoint);
         
-        Task.WaitAll(taskArray);
-        Console.WriteLine("Here");
-    }
-
-    private static void ReadingThread(TcpClient client, CancellationToken cancellationToken)
-    {
-        Byte[] bytes = new Byte[256];
-        String data = null;
+            tcpServer.Start();
         
-        NetworkStream stream = client.GetStream();
-
-        int i;
-
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            // Loop to receive all the data sent by the client.
-            while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+            Console.Write("Waiting for connections... ");
+        
+            var clientOne = await tcpServer.AcceptTcpClientAsync();            
+            Console.WriteLine("Client one connected!\nWaiting for client two...");
+            
+            var clientTwo = await tcpServer.AcceptTcpClientAsync();            
+            Console.WriteLine("Client two connected!");
+        
+            var taskFactory = new TaskFactory();
+            var tokenSource = new CancellationTokenSource();
+            var cancellationToken = tokenSource.Token;
+        
+            var taskArray = new Task[2];
+            taskArray[0] = taskFactory.StartNew(() => MessagingTask(clientOne, clientTwo, cancellationToken));
+            taskArray[1] = taskFactory.StartNew(() => MessagingTask(clientTwo, clientOne, cancellationToken));
+        
+            while (Console.ReadLine() != "q")
             {
-                data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                Console.WriteLine("Received: {0}", data);
+                tokenSource.Cancel();
             }
+        
+            Task.WaitAll(taskArray);
         }
-    }
 
-    private static async Task SendingThread(TcpClient client, CancellationToken cancellationToken)
-    {
-        NetworkStream stream = client.GetStream();
-
-        while (!cancellationToken.IsCancellationRequested)
+        private static async Task MessagingTask(TcpClient clientOne, TcpClient clientTwo, CancellationToken cancellationToken)
         {
-            var data = Encoding.ASCII.GetString(Encoding.ASCII.GetBytes("foo"), 0, 3);
-            byte[] msg = Encoding.ASCII.GetBytes(data);
-            stream.Write(msg, 0, msg.Length);
-            await Task.Delay(3000);
+            var bytes = new byte[256];
+            var clientOneStream = clientOne.GetStream();
+            var clientTwoStream = clientTwo.GetStream();
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                int i;
+                while ((i = await clientOneStream.ReadAsync(bytes, cancellationToken)) != 0)
+                {
+                    var data = Encoding.ASCII.GetString(bytes, 0, i);
+                    Console.WriteLine($"{DateTime.Now}: {data}");
+
+                    var msg = Encoding.ASCII.GetBytes(data);
+                    await clientTwoStream.WriteAsync(msg, cancellationToken);
+                }
+            }
         }
     }
 }
