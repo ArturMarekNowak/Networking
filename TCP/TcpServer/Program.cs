@@ -30,16 +30,33 @@ namespace TCP
             var tokenSource = new CancellationTokenSource();
             var cancellationToken = tokenSource.Token;
         
-            var taskArray = new Task[2];
+            var taskArray = new Task[4];
             taskArray[0] = taskFactory.StartNew(() => MessagingTask(clientOne, clientTwo, cancellationToken));
             taskArray[1] = taskFactory.StartNew(() => MessagingTask(clientTwo, clientOne, cancellationToken));
-        
+            taskArray[2] = taskFactory.StartNew(() => ConnectionStatusThread(clientOne, tokenSource, cancellationToken));
+            taskArray[3] = taskFactory.StartNew(() => ConnectionStatusThread(clientTwo, tokenSource, cancellationToken));
+
             while (Console.ReadLine() != "q")
             {
                 tokenSource.Cancel();
             }
         
             Task.WaitAll(taskArray);
+        }
+
+        private static async void ConnectionStatusThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (!tcpClient.Client.Connected)
+                {
+                    Console.WriteLine($"Client {tcpClient.Client.RemoteEndPoint} disconnected");
+                    tokenSource.Cancel();
+                    break;
+                }
+
+                await Task.Delay(10000);
+            }
         }
 
         private static async Task MessagingTask(TcpClient clientOne, TcpClient clientTwo, CancellationToken cancellationToken)

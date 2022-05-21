@@ -23,16 +23,31 @@ namespace TCP
             var tokenSource = new CancellationTokenSource();
             var cancellationToken = tokenSource.Token;
         
-            var taskArray = new Task[2];
-            taskArray[0] = taskFactory.StartNew(() => ReadingThread(tcpClient, cancellationToken));
-            taskArray[1] = taskFactory.StartNew(() => SendingThread(tcpClient, tokenSource, cancellationToken));
+            var taskArray = new Task[3];
+            taskArray[0] = taskFactory.StartNew(() => ReadingThread(tcpClient, cancellationToken), cancellationToken);
+            taskArray[1] = taskFactory.StartNew(() => SendingThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
+            taskArray[2] = taskFactory.StartNew(() => ConnectionStatusThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
 
             Task.WaitAll(taskArray);
 
             stream.Close();
             tcpClient.Close();
         }
-    
+
+        private static async Task ConnectionStatusThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (!tcpClient.Client.Connected)
+                {
+                    Console.WriteLine("Server disconnected");
+                    tokenSource.Cancel();
+                }
+
+                await Task.Delay(10000);
+            }
+        }
+        
         private static async Task ReadingThread(TcpClient tcpClient, CancellationToken cancellationToken)
         {
             var bytes = new byte[256];
@@ -52,19 +67,56 @@ namespace TCP
         private static async Task SendingThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
         {
             var stream = tcpClient.GetStream();
+            string userInput;
             
             while (!cancellationToken.IsCancellationRequested)
             {
-                var userInput = Console.ReadLine();
-
-                if (userInput is null) 
-                    continue;
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+                
+                userInput = Reader.ReadLine(1000);
 
                 if (userInput.Equals("q"))
                     tokenSource.Cancel();
 
                 var bytes = Encoding.ASCII.GetBytes(userInput);
                 await stream.WriteAsync(bytes, cancellationToken);
+            }
+        }
+        
+        public static class Reader 
+        {
+            private static readonly AutoResetEvent _getInput, _gotInput;
+            private static string _input;
+
+            static Reader() {
+                _getInput = new AutoResetEvent(false);
+                _gotInput = new AutoResetEvent(false);
+                var inputThread = new Thread(ReaderThread);
+                inputThread.IsBackground = true;
+                inputThread.Start();
+            }
+
+            private static void ReaderThread() 
+            {
+                while (true) {
+                    _getInput.WaitOne();
+                    _input = Console.ReadLine();
+                    _gotInput.Set();
+                }
+            }
+
+            public static string ReadLine(int timeOutMillisecs = Timeout.Infinite) 
+            {
+                _getInput.Set();
+                bool success = _gotInput.WaitOne(timeOutMillisecs);
+                
+                if (success)
+                    return _input;
+                
+                throw new TimeoutException("User did not provide input within the timelimit.");
             }
         }
     }
