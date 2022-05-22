@@ -28,7 +28,7 @@ namespace TCP
             taskArray[1] = taskFactory.StartNew(() => SendingThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
             taskArray[2] = taskFactory.StartNew(() => ConnectionStatusThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
 
-            Task.WaitAll(taskArray);
+            Task.WaitAny(taskArray);
 
             stream.Close();
             tcpClient.Close();
@@ -59,7 +59,10 @@ namespace TCP
                 while ((i = stream.Read(bytes)) != 0)
                 {
                     if (cancellationToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine("Server disconnected");
                         return;
+                    }
                     
                     var data = Encoding.ASCII.GetString(bytes, 0, i);
                     Console.WriteLine($"{DateTime.Now}: {data}");
@@ -75,24 +78,25 @@ namespace TCP
             
             while (true)
             {
-                if (Console.In.Peek() > 0)
+                userInput = Console.ReadLine();
+                
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    userInput = Console.ReadLine();
+                    Console.WriteLine("Server disconnected");
+                    return;
                 }
-
+                
                 if (string.IsNullOrEmpty(userInput))
                     continue;
 
                 if (userInput.Equals("q"))
+                {
+                    Console.WriteLine("Closing application...");
                     tokenSource.Cancel();
-
-                if (cancellationToken.IsCancellationRequested)
-                    return;
+                }
 
                 var bytes = Encoding.ASCII.GetBytes(userInput);
                 stream.Write(bytes);
-
-                userInput = "";
             }
         }
     }
