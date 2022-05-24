@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TCP
 {
-    public sealed class TcpClientOne
+    public sealed class TcpClientTwo
     {
         public static async Task Main()
         {
@@ -23,48 +23,79 @@ namespace TCP
             var tokenSource = new CancellationTokenSource();
             var cancellationToken = tokenSource.Token;
         
-            var taskArray = new Task[2];
-            taskArray[0] = taskFactory.StartNew(() => ReadingThread(tcpClient, cancellationToken));
-            taskArray[1] = taskFactory.StartNew(() => SendingThread(tcpClient, tokenSource, cancellationToken));
-
-            Task.WaitAll(taskArray);
+            var taskArray = new Task[3];
+            taskArray[0] = taskFactory.StartNew(() => ReadingThread(tcpClient, cancellationToken), cancellationToken);
+            taskArray[1] = taskFactory.StartNew(() => SendingThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
+            taskArray[2] = taskFactory.StartNew(() => ConnectionStatusThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
+            
+            Task.WaitAny(taskArray);
 
             stream.Close();
             tcpClient.Close();
         }
-    
-        private static async Task ReadingThread(TcpClient tcpClient, CancellationToken cancellationToken)
+
+        private static void ConnectionStatusThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (!tcpClient.Client.Connected)
+                {
+                    Console.WriteLine("Server disconnected");
+                    tokenSource.Cancel();
+                }
+
+                Task.Delay(1000);
+            }
+        }
+        
+        private static void ReadingThread(TcpClient tcpClient, CancellationToken cancellationToken)
         {
             var bytes = new byte[256];
             var stream = tcpClient.GetStream();
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (true)
             {
                 int i;
-                while ((i = await stream.ReadAsync(bytes, cancellationToken)) != 0)
+                while ((i = stream.Read(bytes)) != 0)
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine("Server disconnected");
+                        return;
+                    }
+
                     var data = Encoding.ASCII.GetString(bytes, 0, i);
                     Console.WriteLine($"{DateTime.Now}: {data}");
                 }
             }
         }
 
-        private static async Task SendingThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void SendingThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
         {
             var stream = tcpClient.GetStream();
+            string userInput = "";
             
-            while (!cancellationToken.IsCancellationRequested)
+            while (true)
             {
-                var userInput = Console.ReadLine();
+                userInput = Console.ReadLine();
 
-                if (userInput is null) 
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    Console.WriteLine("Server disconnected");
+                    return;
+                }
+                
+                if (string.IsNullOrEmpty(userInput))
                     continue;
 
                 if (userInput.Equals("q"))
+                {
+                    Console.WriteLine("Closing application...");
                     tokenSource.Cancel();
+                }
 
                 var bytes = Encoding.ASCII.GetBytes(userInput);
-                await stream.WriteAsync(bytes, cancellationToken);
+                stream.Write(bytes);
             }
         }
     }

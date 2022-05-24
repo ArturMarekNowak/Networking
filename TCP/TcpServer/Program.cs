@@ -25,24 +25,34 @@ namespace TCP
             
             var clientTwo = await tcpServer.AcceptTcpClientAsync();            
             Console.WriteLine("Client two connected!");
-        
+
             var taskFactory = new TaskFactory();
             var tokenSource = new CancellationTokenSource();
             var cancellationToken = tokenSource.Token;
         
-            var taskArray = new Task[2];
-            taskArray[0] = taskFactory.StartNew(() => MessagingTask(clientOne, clientTwo, cancellationToken));
-            taskArray[1] = taskFactory.StartNew(() => MessagingTask(clientTwo, clientOne, cancellationToken));
-        
-            while (Console.ReadLine() != "q")
-            {
-                tokenSource.Cancel();
-            }
-        
-            Task.WaitAll(taskArray);
+            var taskArray = new Task[3];
+            taskArray[0] = taskFactory.StartNew(() => MessagingTask(clientOne, clientTwo, tokenSource, cancellationToken), cancellationToken);
+            taskArray[1] = taskFactory.StartNew(() => MessagingTask(clientTwo, clientOne, tokenSource, cancellationToken), cancellationToken);
+            taskArray[2] = taskFactory.StartNew(() => ServerConsole(tokenSource, cancellationToken), cancellationToken);
+
+            Task.WaitAny(taskArray);
         }
 
-        private static async Task MessagingTask(TcpClient clientOne, TcpClient clientTwo, CancellationToken cancellationToken)
+        private static void ServerConsole(CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                while (Console.ReadLine() != "q")
+                {
+                    
+                }
+
+                Console.WriteLine("Closing application...");
+                tokenSource.Cancel();
+            }
+        }
+
+        private static void MessagingTask(TcpClient clientOne, TcpClient clientTwo, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
         {
             var bytes = new byte[256];
             var clientOneStream = clientOne.GetStream();
@@ -51,13 +61,19 @@ namespace TCP
             while (!cancellationToken.IsCancellationRequested)
             {
                 int i;
-                while ((i = await clientOneStream.ReadAsync(bytes, cancellationToken)) != 0)
+                while ((i = clientOneStream.Read(bytes)) != 0)
                 {
                     var data = Encoding.ASCII.GetString(bytes, 0, i);
                     Console.WriteLine($"{DateTime.Now}: {data}");
 
                     var msg = Encoding.ASCII.GetBytes(data);
-                    await clientTwoStream.WriteAsync(msg, cancellationToken);
+                    clientTwoStream.Write(msg);
+                }
+
+                if (i == 0)
+                {
+                    Console.WriteLine($"Client {clientOne.Client.LocalEndPoint} disconnected");
+                    tokenSource.Cancel();
                 }
             }
         }
