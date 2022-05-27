@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientOne", "UdpClientOn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientTwo", "UdpClientTwo\UdpClientTwo.csproj", "{C6801BBF-4DEC-4123-A379-28F7EB54F24B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdpClientThree", "UdpClientThree\UdpClientThree.csproj", "{36CCE541-44EF-407A-B3B8-C6936D652154}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{C6801BBF-4DEC-4123-A379-28F7EB54F24B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6801BBF-4DEC-4123-A379-28F7EB54F24B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6801BBF-4DEC-4123-A379-28F7EB54F24B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{36CCE541-44EF-407A-B3B8-C6936D652154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{36CCE541-44EF-407A-B3B8-C6936D652154}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{36CCE541-44EF-407A-B3B8-C6936D652154}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{36CCE541-44EF-407A-B3B8-C6936D652154}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

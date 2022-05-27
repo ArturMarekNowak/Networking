@@ -7,84 +7,51 @@ using System.Threading.Tasks;
 
 namespace TCP
 {
-    public sealed class TcpClientTwo
+    public sealed class UdpClientOne
     {
-        public static async Task Main()
+        public static void Main()
         {
-            var ipAddress = IPAddress.Parse("127.0.0.1");
-            var ipEndpoint = new IPEndPoint(ipAddress, 12346);
-            var tcpClient = new TcpClient(ipEndpoint);
-        
-            await tcpClient.ConnectAsync(ipAddress, 12345);
+            var clientEndpoint = new IPEndPoint(IPAddress.Loopback, 12346);
+            var serverEndpoint = new IPEndPoint(IPAddress.Loopback, 12344);
+            var udpClient = new UdpClient(clientEndpoint);
             
-            var stream = tcpClient.GetStream();
-        
             var taskFactory = new TaskFactory();
             var tokenSource = new CancellationTokenSource();
             var cancellationToken = tokenSource.Token;
         
-            var taskArray = new Task[3];
-            taskArray[0] = taskFactory.StartNew(() => ReadingThread(tcpClient, cancellationToken), cancellationToken);
-            taskArray[1] = taskFactory.StartNew(() => SendingThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
-            taskArray[2] = taskFactory.StartNew(() => ConnectionStatusThread(tcpClient, tokenSource, cancellationToken), cancellationToken);
+            var taskArray = new Task[2];
+            taskArray[0] = taskFactory.StartNew(() => ReadingThread(udpClient, serverEndpoint, cancellationToken), cancellationToken);
+            taskArray[1] = taskFactory.StartNew(() => SendingThread(udpClient, serverEndpoint, tokenSource, cancellationToken), cancellationToken);
             
             Task.WaitAny(taskArray);
-
-            stream.Close();
-            tcpClient.Close();
+            
+            udpClient.Close();
         }
 
-        private static void ConnectionStatusThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void ReadingThread(UdpClient udpClient, IPEndPoint ipEndPoint, CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                if (!tcpClient.Client.Connected)
-                {
-                    Console.WriteLine("Server disconnected");
-                    tokenSource.Cancel();
-                }
-
-                Task.Delay(1000);
-            }
-        }
-        
-        private static void ReadingThread(TcpClient tcpClient, CancellationToken cancellationToken)
-        {
-            var bytes = new byte[256];
-            var stream = tcpClient.GetStream();
-
             while (true)
             {
-                int i;
-                while ((i = stream.Read(bytes)) != 0)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        Console.WriteLine("Server disconnected");
-                        return;
-                    }
-
-                    var data = Encoding.ASCII.GetString(bytes, 0, i);
-                    Console.WriteLine($"{DateTime.Now}: {data}");
+                    Console.WriteLine("Closing application...");
+                    return;
                 }
+               
+                var data = udpClient.Receive(ref ipEndPoint);
+                var message= Encoding.ASCII.GetString(data, 0, data.Length);
+                Console.WriteLine($"{DateTime.Now}: {message}");
             }
         }
 
-        private static void SendingThread(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void SendingThread(UdpClient udpClient, IPEndPoint ipEndPoint, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
         {
-            var stream = tcpClient.GetStream();
             string userInput = "";
             
             while (true)
             {
                 userInput = Console.ReadLine();
 
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    Console.WriteLine("Server disconnected");
-                    return;
-                }
-                
                 if (string.IsNullOrEmpty(userInput))
                     continue;
 
@@ -95,7 +62,7 @@ namespace TCP
                 }
 
                 var bytes = Encoding.ASCII.GetBytes(userInput);
-                stream.Write(bytes);
+                udpClient.Send(bytes, bytes.Length, ipEndPoint);
             }
         }
     }
