@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TCP
+namespace UDP
 {
-    public sealed class UdpClientOne
+    public sealed class UdpClientTwo
     {
         public static void Main()
         {

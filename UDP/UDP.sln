@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServer", "UdpServer\UdpServer.csproj", "{E76D74CD-066C-448C-9DD5-98FB6852AAFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdpServer", "UdpServer\UdpServer.csproj", "{E76D74CD-066C-448C-9DD5-98FB6852AAFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientOne", "UdpClientOne\UdpClientOne.csproj", "{5F473DBC-A8F3-403D-B338-9F7B39F6D329}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdpClientOne", "UdpClientOne\UdpClientOne.csproj", "{5F473DBC-A8F3-403D-B338-9F7B39F6D329}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClientTwo", "UdpClientTwo\UdpClientTwo.csproj", "{C6801BBF-4DEC-4123-A379-28F7EB54F24B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdpClientTwo", "UdpClientTwo\UdpClientTwo.csproj", "{C6801BBF-4DEC-4123-A379-28F7EB54F24B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
