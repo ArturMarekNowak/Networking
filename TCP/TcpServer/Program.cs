@@ -29,7 +29,6 @@ namespace TCP
             Console.WriteLine("Client two connected!");
 
             var tokenSource = new CancellationTokenSource();
-            var cancellationToken = tokenSource.Token;
         
             Task.WaitAny(new Task[]
             {
