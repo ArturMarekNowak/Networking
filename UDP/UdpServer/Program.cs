@@ -12,31 +12,29 @@ namespace UDP
     {
         public static void Main()
         {
-            var taskFactory = new TaskFactory();
             var tokenSource = new CancellationTokenSource();
-            var cancellationToken = tokenSource.Token;
-    
-            var taskArray = new Task[2];
-            taskArray[0] = taskFactory.StartNew(() => MessagingTask(12344, 12347, tokenSource, cancellationToken), cancellationToken);
-            taskArray[1] = taskFactory.StartNew(() => MessagingTask(12345, 12346, tokenSource, cancellationToken), cancellationToken);
 
-            Task.WaitAny(taskArray);
+            Task.WaitAny(new Task[]
+            {
+                Task.Run(() => TransferDataBetweenClients(12344, 12347, tokenSource)),
+                Task.Run(() => TransferDataBetweenClients(12345, 12346, tokenSource)),
+            });
         }
 
-        private static void MessagingTask(int recevingPort, int sendingPort, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void TransferDataBetweenClients(int sourcePort, int targetPort, CancellationTokenSource tokenSource)
         {
-            UdpClient receiver = new UdpClient(recevingPort);
+            UdpClient sourceClient = new UdpClient(sourcePort);
             IPEndPoint remoteIp = null;
-            UdpClient sender = new UdpClient();
+            UdpClient targetClient = new UdpClient();
             
-            while (!cancellationToken.IsCancellationRequested)
+            while (!tokenSource.Token.IsCancellationRequested)
             {
-                var bytes = receiver.Receive(ref remoteIp);
-                var message = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
+                var buffer = sourceClient.Receive(ref remoteIp);
+                var message = Encoding.ASCII.GetString(buffer, 0, buffer.Length);
 
                 Console.WriteLine($"{DateTime.Now}: {message}");
                 
-                sender.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Loopback, sendingPort));
+                targetClient.Send(buffer, buffer.Length, new IPEndPoint(IPAddress.Loopback, targetPort));
             }
         }
     }
