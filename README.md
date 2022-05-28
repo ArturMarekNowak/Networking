@@ -14,7 +14,8 @@ This repository contains implementations of simple networking examples.
 ## General info
 Thus far there are two projects implemented:
 
-1. TCP - implementation of simple chat in client-server-client architecture. This implementation has two major assumptions. One is usage of multithreading and the second one is implementation of some sort of graceful shutdown on client or server disconnection. This repository was review by [@peter-csala](https://github.com/peter-csala) on CodeReview stack exchange: [Multithreaded tcp server accepting two clients with task factory and graceful shutdown](https://codereview.stackexchange.com/questions/276755/multithreaded-tcp-server-accepting-two-clients-with-task-factory-and-graceful-sh)
+1. TCP - implementation of simple chat in client-server-client architecture. This implementation has two major assumptions. One is usage of multithreading and the second one is implementation of some sort of graceful shutdown on client or server disconnection. TCP protocol is utlized in order to provide connection-oriented communication between sockets. This repository was review by [@peter-csala](https://github.com/peter-csala) on CodeReview stack exchange: [Multithreaded tcp server accepting two clients with task factory and graceful shutdown](https://codereview.stackexchange.com/questions/276755/multithreaded-tcp-server-accepting-two-clients-with-task-factory-and-graceful-sh)
+2. UDP - implementation of simple chat in client-server-client architecture. This implementation has two major assumptions. One is usage of multithreading and the second one is implementation of some sort of graceful shutdown on client or server disconnection. UDP protocol is utilized in order to provide connection-less communication between sockets.  
 
 ## Table of contents
 * [General info](#general-info)
