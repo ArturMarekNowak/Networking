@@ -1,6 +1,5 @@
 # Networking
-This repository contains TCP and UDP clients and servers implementations.
-
+This repository contains implementations of simple networking examples.
 
 ## Table of contents
 * [General info](#general-info)
@@ -13,27 +12,39 @@ This repository contains TCP and UDP clients and servers implementations.
 
 
 ## General info
-There will be more here, stay tuned!
+Thus far there are two projects implemented:
 
+1. TCP - implementation of simple chat in client-server-client architecture. This implementation has two major assumptions. One is usage of multithreading and the second one is implementation of some sort of graceful shutdown on client or server disconnection. This repository was review by @peter-csala on CodeReview stack exchange: # Networking
+This repository contains implementations of simple networking examples.
+
+## Table of contents
+* [General info](#general-info)
+* [Screenshots](#screenshots)
+* [Technologies](#technologies)
+* [Setup](#setup)
+* [Features](#features)
+* [Status](#status)
+* [Inspiration](#inspiration)
+
+
+## General info
+Thus far there are two projects implemented:
+
+1. TCP - implementation of simple chat in client-server-client architecture. This implementation has two major assumptions. One is usage of multithreading and the second one is implementation of some sort of gr
+aceful shutdown on client or server disconnection. This repository was review by @peter-csala on CodeReview stack exchange: 
+https://codereview.stackexchange.com/questions/276755/multithreaded-tcp-server-accepting-two-clients-with-task-factory-and-graceful-sh. Many thanks!
 
 ## Screenshots
 There will be more here, stay tuned!
 
 
 ## Technologies
-* csc 4.8.4084.0
+* .NET 6
+* Jetbrains Rider 
 
 
 ## Setup
-Provided that you have make and csc all you need to do is to change the directory to the desired one for example:
-
-`cd TcpSyncClientServerIPv4`
-
-and run make:
-
-`make all`
-
-make will run csc and .exe files will appear in your directory
+I am making sure that `dotnet build` is all that you need to make everything work. 
 
 ## Code Examples
 There will be more here, stay tuned!
