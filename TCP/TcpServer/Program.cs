@@ -15,66 +15,59 @@ namespace TCP
             var ipAddress = IPAddress.Parse("127.0.0.1");
             var ipEndpoint = new IPEndPoint(ipAddress, 12345);
             var tcpServer = new TcpListener(ipEndpoint);
-        
+
             tcpServer.Start();
         
+            var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(90));
+            
             Console.Write("Waiting for connections... ");
         
-            var clientOne = await tcpServer.AcceptTcpClientAsync();            
+            var clientOne = await tcpServer.AcceptTcpClientAsync(timeout.Token);            
             Console.WriteLine("Client one connected!\nWaiting for client two...");
             
-            var clientTwo = await tcpServer.AcceptTcpClientAsync();            
+            var clientTwo = await tcpServer.AcceptTcpClientAsync(timeout.Token);            
             Console.WriteLine("Client two connected!");
 
-            var taskFactory = new TaskFactory();
             var tokenSource = new CancellationTokenSource();
             var cancellationToken = tokenSource.Token;
         
-            var taskArray = new Task[3];
-            taskArray[0] = taskFactory.StartNew(() => MessagingTask(clientOne, clientTwo, tokenSource, cancellationToken), cancellationToken);
-            taskArray[1] = taskFactory.StartNew(() => MessagingTask(clientTwo, clientOne, tokenSource, cancellationToken), cancellationToken);
-            taskArray[2] = taskFactory.StartNew(() => ServerConsole(tokenSource, cancellationToken), cancellationToken);
-
-            Task.WaitAny(taskArray);
+            Task.WaitAny(new Task[]
+            {
+                Task.Run(() => TransferDataBetweenClients(clientOne, clientTwo, tokenSource)),
+                Task.Run(() => TransferDataBetweenClients(clientTwo, clientOne, tokenSource)),
+                Task.Run(() => ReadConsoleForUserCommands(tokenSource)),
+            });
         }
 
-        private static void ServerConsole(CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void ReadConsoleForUserCommands(CancellationTokenSource tokenSource)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (Console.ReadLine() != "q" && Console.ReadLine() != "Q") 
             {
-                while (Console.ReadLine() != "q")
-                {
                     
-                }
-
-                Console.WriteLine("Closing application...");
-                tokenSource.Cancel();
             }
+                
+            Console.WriteLine("Closing application...");
+            tokenSource.Cancel();
         }
 
-        private static void MessagingTask(TcpClient clientOne, TcpClient clientTwo, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void TransferDataBetweenClients(TcpClient sourceClient, TcpClient targetClient, CancellationTokenSource tokenSource)
         {
-            var bytes = new byte[256];
-            var clientOneStream = clientOne.GetStream();
-            var clientTwoStream = clientTwo.GetStream();
+            var buffer = new byte[256];
+            var sourceClientStream = sourceClient.GetStream();
+            var targetClientStream = targetClient.GetStream();
 
-            while (!cancellationToken.IsCancellationRequested)
+            while (!tokenSource.Token.IsCancellationRequested)
             {
-                int i;
-                while ((i = clientOneStream.Read(bytes)) != 0)
+                int readBytes;
+                while ((readBytes = sourceClientStream.Read(buffer)) != 0)
                 {
-                    var data = Encoding.ASCII.GetString(bytes, 0, i);
-                    Console.WriteLine($"{DateTime.Now}: {data}");
-
-                    var msg = Encoding.ASCII.GetBytes(data);
-                    clientTwoStream.Write(msg);
+                    var message = Encoding.ASCII.GetString(buffer, 0, readBytes);
+                    Console.WriteLine($"{DateTime.Now}: {message}");
+                    targetClientStream.Write(Encoding.ASCII.GetBytes(message));
                 }
-
-                if (i == 0)
-                {
-                    Console.WriteLine($"Client {clientOne.Client.LocalEndPoint} disconnected");
-                    tokenSource.Cancel();
-                }
+                
+                Console.WriteLine($"Client {sourceClient.Client.LocalEndPoint} disconnected");
+                tokenSource.Cancel();
             }
         }
     }
