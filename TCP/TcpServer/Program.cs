@@ -40,9 +40,10 @@ namespace TCP
 
         private static void ReadConsoleForUserCommands(CancellationTokenSource tokenSource)
         {
-            while (Console.ReadLine() != "q" && Console.ReadLine() != "Q") 
+            var userInput = Console.ReadLine();
+            while (userInput != "q" && userInput != "Q")
             {
-                    
+                userInput = Console.ReadLine();
             }
                 
             Console.WriteLine("Closing application...");
