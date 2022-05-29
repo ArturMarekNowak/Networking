@@ -1,4 +1,6 @@
 # Networking
+![Build](https://github.com/ArturMarekNowak/Networking/actions/workflows/build.yml/badge.svg)
+
 This repository contains implementations of simple networking examples.
 
 ## Table of contents
