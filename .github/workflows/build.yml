@@ -17,12 +17,12 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
+    - name: Restore dependencies in UDP project
       run: dotnet restore UDP/UDP.sln
-    - name: Build
+    - name: Build UDP project
       run: dotnet build UDP/UDP.sln --no-restore
-    - name: Restore dependencies
+    - name: Restore dependencies in TCP project
       run: dotnet restore TCP/TCP.sln
-    - name: Build
+    - name: Build UDP project
       run: dotnet build TCP/TCP.sln --no-restore
     
