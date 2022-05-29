@@ -1,5 +1,6 @@
 # Networking
 ![Build](https://github.com/ArturMarekNowak/Networking/actions/workflows/build.yml/badge.svg)
+[![CodeFactor](https://www.codefactor.io/repository/github/arturmareknowak/networking/badge/master)](https://www.codefactor.io/repository/github/arturmareknowak/networking/overview/master)
 
 This repository contains implementations of simple networking examples.
 
