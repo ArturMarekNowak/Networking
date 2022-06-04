@@ -1,7 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,72 +18,56 @@ namespace TCP
         
             await tcpClient.ConnectAsync(ipAddress, 12345);
             
-            var tokenSource = new CancellationTokenSource();
-            var cancellationToken = tokenSource.Token;
-        
             Task.WaitAny(new[]
             {
-                Task.Run(() => ReadIncomingMessages(tcpClient, cancellationToken)),
-                Task.Run(() => SendUserInputs(tcpClient, tokenSource, cancellationToken)),
-                Task.Run(() => CheckConnectionPeriodically(tcpClient, tokenSource, cancellationToken)),
+                Task.Run(() => ReadIncomingMessages(tcpClient)),
+                Task.Run(() => SendUserInputs(tcpClient)),
             });
             
             tcpClient.Close();
         }
 
-        private static async Task CheckConnectionPeriodically(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
-        {
-            while (tcpClient.Client.Connected && !tokenSource.Token.IsCancellationRequested)
-            {
-                await Task.Delay(1000);
-            }
-
-            Console.WriteLine($"Server disconnected, caught in {MethodBase.GetCurrentMethod()}");
-            if (!tcpClient.Client.Connected) tokenSource.Cancel();
-        }
-        
-        private static async Task ReadIncomingMessages(TcpClient tcpClient, CancellationToken cancellationToken)
+        private static void ReadIncomingMessages(TcpClient tcpClient)
         {
             var buffer = new byte[256];
             var stream = tcpClient.GetStream();
 
-            while (!cancellationToken.IsCancellationRequested) 
+            try
             {
-                int readBytes = stream.Read(buffer);
-                if (readBytes == 0)
-                {
-                    await Task.Delay(100);
-                    continue;
+                int readBytes;
+                while ((readBytes = stream.Read(buffer)) != 0)
+                { 
+                    var message = Encoding.ASCII.GetString(buffer, 0, readBytes); 
+                    Console.WriteLine($"{DateTime.Now}: {message}");
                 }
-                var message = Encoding.ASCII.GetString(buffer, 0, readBytes);
-                Console.WriteLine($"{DateTime.Now}: {message}");
             }
-
-            Console.WriteLine($"Server disconnected, caught in {MethodBase.GetCurrentMethod()}");
+            catch (IOException)
+            {
+                Console.WriteLine("Server disconnected");
+            }
         }
 
-        private static void SendUserInputs(TcpClient tcpClient, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void SendUserInputs(TcpClient tcpClient)
         {
             var stream = tcpClient.GetStream();
-            do
-            {
-                var userInput = Console.ReadLine();
-                if (string.IsNullOrEmpty(userInput)) continue;
-                if (userInput.Equals("q")) break;
 
-                var bytes = Encoding.ASCII.GetBytes(userInput);
-                stream.Write(bytes);
-
-            } while (!tokenSource.Token.IsCancellationRequested);
-
-            if (tokenSource.Token.IsCancellationRequested)
+            try
             {
-                Console.WriteLine($"Server disconnected, caught in {MethodBase.GetCurrentMethod()}");
-            }
-            else
-            {
+                while (true)
+                {
+                    var userInput = Console.ReadLine();
+                    if (string.IsNullOrEmpty(userInput)) continue;
+                    if (userInput.Equals("q")) break;
+
+                    var bytes = Encoding.ASCII.GetBytes(userInput);
+                    stream.Write(bytes);
+                }
+                
                 Console.WriteLine("Closing application...");
-                tokenSource.Cancel();
+            }
+            catch (IOException)
+            {
+                Console.WriteLine("Server disconnected");
             }
         }
     }
