@@ -55,7 +55,7 @@ namespace TCP
             var buffer = new byte[256];
             var sourceClientStream = sourceClient.GetStream();
             var targetClientStream = targetClient.GetStream();
-
+            
             while (!tokenSource.Token.IsCancellationRequested)
             {
                 int readBytes;
@@ -66,7 +66,7 @@ namespace TCP
                     targetClientStream.Write(Encoding.ASCII.GetBytes(message));
                 }
                 
-                Console.WriteLine($"Client {sourceClient.Client.LocalEndPoint} disconnected");
+                Console.WriteLine($"Client {sourceClient.Client.RemoteEndPoint} disconnected");
                 tokenSource.Cancel();
             }
         }
