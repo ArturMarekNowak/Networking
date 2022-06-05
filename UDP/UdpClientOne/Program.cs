@@ -15,42 +15,34 @@ namespace UDP
             var serverEndpoint = new IPEndPoint(IPAddress.Loopback, 12344);
             var udpClient = new UdpClient(clientEndpoint);
             
-            var taskFactory = new TaskFactory();
             var tokenSource = new CancellationTokenSource();
-            var cancellationToken = tokenSource.Token;
-        
-            var taskArray = new Task[2];
-            taskArray[0] = taskFactory.StartNew(() => ReadingThread(udpClient, serverEndpoint, cancellationToken), cancellationToken);
-            taskArray[1] = taskFactory.StartNew(() => SendingThread(udpClient, serverEndpoint, tokenSource, cancellationToken), cancellationToken);
             
-            Task.WaitAny(taskArray);
+            Task.WaitAny(new []
+            {
+                Task.Run(() => ReadIncomingMessages(udpClient, serverEndpoint, tokenSource)),
+                Task.Run(() => SendUserInputs(udpClient, serverEndpoint, tokenSource))
+            });
             
             udpClient.Close();
         }
 
-        private static void ReadingThread(UdpClient udpClient, IPEndPoint ipEndPoint, CancellationToken cancellationToken)
+        private static void ReadIncomingMessages(UdpClient udpClient, IPEndPoint ipEndPoint, CancellationTokenSource tokenSource)
         {
-            while (true)
+            while (!tokenSource.Token.IsCancellationRequested)
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    Console.WriteLine("Closing application...");
-                    return;
-                }
-               
-                var data = udpClient.Receive(ref ipEndPoint);
-                var message= Encoding.ASCII.GetString(data, 0, data.Length);
+                var readBytes = udpClient.Receive(ref ipEndPoint);
+                var message= Encoding.ASCII.GetString(readBytes, 0, readBytes.Length);
                 Console.WriteLine($"{DateTime.Now}: {message}");
             }
+            
+            Console.WriteLine("Closing application...");
         }
 
-        private static void SendingThread(UdpClient udpClient, IPEndPoint ipEndPoint, CancellationTokenSource tokenSource, CancellationToken cancellationToken)
+        private static void SendUserInputs(UdpClient udpClient, IPEndPoint ipEndPoint, CancellationTokenSource tokenSource)
         {
-            string userInput = "";
-            
-            while (true)
+            do
             {
-                userInput = Console.ReadLine();
+                var userInput = Console.ReadLine();
 
                 if (string.IsNullOrEmpty(userInput))
                     continue;
@@ -63,7 +55,8 @@ namespace UDP
 
                 var bytes = Encoding.ASCII.GetBytes(userInput);
                 udpClient.Send(bytes, bytes.Length, ipEndPoint);
-            }
+                
+            } while (!tokenSource.Token.IsCancellationRequested);
         }
     }
 }

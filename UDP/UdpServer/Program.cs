@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -18,7 +17,20 @@ namespace UDP
             {
                 Task.Run(() => TransferDataBetweenClients(12344, 12347, tokenSource)),
                 Task.Run(() => TransferDataBetweenClients(12345, 12346, tokenSource)),
+                Task.Run(() => ReadConsoleForUserCommands(tokenSource)),
             });
+        }
+
+        private static void ReadConsoleForUserCommands(CancellationTokenSource tokenSource)
+        {
+            var userInput = Console.ReadLine();
+            while (userInput != "q" && userInput != "Q")
+            {
+                userInput = Console.ReadLine();
+            }
+                
+            Console.WriteLine("Closing application...");
+            tokenSource.Cancel();
         }
 
         private static void TransferDataBetweenClients(int sourcePort, int targetPort, CancellationTokenSource tokenSource)
