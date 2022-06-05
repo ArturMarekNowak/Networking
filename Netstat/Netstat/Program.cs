@@ -1,10 +1,8 @@
-﻿using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
+﻿using System.Net.NetworkInformation;
 
 namespace Netstat
 {
-    public sealed class Netstat
+    public static class Netstat
     {
         public static void Main()
         {
