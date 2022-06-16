@@ -48,20 +48,23 @@ namespace NTP
         // Leap Indicator: First two bits - warning of an impending leap second to be inserted/deleted
         // Version Number: Middle three bits - indicating version number, 011 equal to IPv4 only
         // Mode values: Last three bits - indicating the mode, 011 equal to client mode
-        private static byte[] _requestBytes = new byte[] { 0b00011011 };
-        
+        private static readonly byte _requestByte = 0b00011011 ;
+        private static readonly byte[] _requestBytes = new byte[48] ;
+
         private static async Task DisplayNtpServerResponsePeriodically(UdpClient udpClient,
             IPEndPoint ntpServerEndpoint, CancellationTokenSource tokenSource)
         {
             while (!tokenSource.Token.IsCancellationRequested)
             {
+                _requestBytes[0] = _requestByte;
+
                 udpClient.Send(_requestBytes);
                 var bytesBuffer = udpClient.Receive(ref ntpServerEndpoint);
 
                 var serverResponseReceivedDateTime = DateTime.Now;
                 var ntpServerTimestamps = GetNtpTimeStamps(bytesBuffer);
 
-                Console.WriteLine($"{ntpServerTimestamps.ToString(serverResponseReceivedDateTime)}");
+                Console.WriteLine($"{ntpServerTimestamps.DisplayMessage(serverResponseReceivedDateTime)}");
 
                 await Task.Delay(5000, tokenSource.Token);
             }
@@ -118,9 +121,9 @@ namespace NTP
                 => $"{prefix}: {timestamp}:{timestamp.Millisecond}";
 
             private string FormatDateTimesToDisplay(string prefix, DateTime received, DateTime timestamp)
-                => $"{prefix}-Now difference: {(received - timestamp).TotalMilliseconds}";
+                => $"{prefix}-Now difference: {Math.Abs((received - timestamp).TotalMilliseconds)}";
 
-            public string ToString(DateTime serverResponseReceivedDateTime) => string.Join(Environment.NewLine, new[]
+            public string DisplayMessage(DateTime serverResponseReceivedDateTime) => string.Join(Environment.NewLine, new[]
             {
                     "-------------------NTP Server Response-------------------",
                     FormatDateTimeToDisplay("Reference", _referenceTimestamp),
