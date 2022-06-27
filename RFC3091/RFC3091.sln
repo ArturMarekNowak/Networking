@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiGen", "PiGen\PiGen.csproj", "{4609B80D-AD0B-40F4-AB36-733A0D0DDA6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPBasedDigitGeneratorRequester", "TCPBasedDigitGeneratorRequester\TCPBasedDigitGeneratorRequester.csproj", "{E1906955-F8D4-45F1-8F70-C68954FB77D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApproximateServiceRequester", "ApproximateServiceRequester\ApproximateServiceRequester.csproj", "{146C0848-C510-4714-90E1-AAAC9885F6F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDPBasedDigitGeneratorRequester", "UDPBasedDigitGeneratorRequester\UDPBasedDigitGeneratorRequester.csproj", "{5888E016-912E-49F6-9B7C-58FC71B155C5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4609B80D-AD0B-40F4-AB36-733A0D0DDA6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4609B80D-AD0B-40F4-AB36-733A0D0DDA6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4609B80D-AD0B-40F4-AB36-733A0D0DDA6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4609B80D-AD0B-40F4-AB36-733A0D0DDA6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1906955-F8D4-45F1-8F70-C68954FB77D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1906955-F8D4-45F1-8F70-C68954FB77D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1906955-F8D4-45F1-8F70-C68954FB77D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1906955-F8D4-45F1-8F70-C68954FB77D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{146C0848-C510-4714-90E1-AAAC9885F6F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{146C0848-C510-4714-90E1-AAAC9885F6F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{146C0848-C510-4714-90E1-AAAC9885F6F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{146C0848-C510-4714-90E1-AAAC9885F6F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5888E016-912E-49F6-9B7C-58FC71B155C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5888E016-912E-49F6-9B7C-58FC71B155C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5888E016-912E-49F6-9B7C-58FC71B155C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5888E016-912E-49F6-9B7C-58FC71B155C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

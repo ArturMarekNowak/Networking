@@ -45,8 +45,7 @@ There will be more here, stay tuned!
 
 
 ## To-do list:
-* SMTP
-* FTP
+
 * RFC3091
 
 ## Status
