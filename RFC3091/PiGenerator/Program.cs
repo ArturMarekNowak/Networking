@@ -1,6 +1,6 @@
-﻿namespace PiGen
+﻿namespace RFC3091
 {
-    class Program
+    public sealed class Program
     {
         public static void Main()
         {
