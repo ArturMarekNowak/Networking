@@ -17,12 +17,39 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies in UDP project
+        
+    - name: Restore dependencies in UDP solution
       run: dotnet restore UDP/UDP.sln
-    - name: Build UDP project
+    - name: Build UDP solution
       run: dotnet build UDP/UDP.sln --no-restore
-    - name: Restore dependencies in TCP project
+      
+    - name: Restore dependencies in TCP solution
       run: dotnet restore TCP/TCP.sln
-    - name: Build UDP project
+    - name: Build TCP solution
       run: dotnet build TCP/TCP.sln --no-restore
+      
+    - name: Restore dependencies in SMTP solution
+      run: dotnet restore SMTP/SMTP.sln
+    - name: Build SMTP solution
+      run: dotnet build SMTP/SMTP.sln --no-restore
+      
+    - name: Restore dependencies in RFC3091 solution
+      run: dotnet restore RFC3091/RFC3091.sln
+    - name: Build RFC3091 solution
+      run: dotnet build RFC3091/RFC3091.sln --no-restore
+    
+    - name: Restore dependencies in Ping solution
+      run: dotnet restore Ping/Ping.sln
+    - name: Build Ping solution
+      run: dotnet build Ping/Ping.sln --no-restore
+      
+    - name: Restore dependencies in NTP solution
+      run: dotnet restore NTP/NTP.sln
+    - name: Build NTP solution
+      run: dotnet build NTP/NTP.sln --no-restore
+      
+    - name: Restore dependencies in Netstat solution
+      run: dotnet restore Netstat/Netstat.sln
+    - name: Build Netstat solution
+      run: dotnet build Netstat/Netstat.sln --no-restore
     
