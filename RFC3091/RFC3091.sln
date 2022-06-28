@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiGen", "PiGen\PiGen.csproj", "{4609B80D-AD0B-40F4-AB36-733A0D0DDA6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiGenerator", "PiGenerator\PiGenerator.csproj", "{4609B80D-AD0B-40F4-AB36-733A0D0DDA6E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPBasedDigitGeneratorRequester", "TCPBasedDigitGeneratorRequester\TCPBasedDigitGeneratorRequester.csproj", "{E1906955-F8D4-45F1-8F70-C68954FB77D2}"
 EndProject
