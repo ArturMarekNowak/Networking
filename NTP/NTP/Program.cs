@@ -86,7 +86,7 @@ namespace NTP
                 seconds = ConvertToLittleEndianUnsignedLong(seconds);
                 secondsFraction = ConvertToLittleEndianUnsignedLong(secondsFraction);
 
-                var milliseconds = seconds * MilliSecondMultiplier + secondsFraction * MilliSecondMultiplier / MilliSecondDivider;
+                var milliseconds = (seconds * MilliSecondMultiplier) + (secondsFraction * (MilliSecondMultiplier / MilliSecondDivider));
                 timestamps.Add(baseTime.AddMilliseconds((long)milliseconds));
             }
 

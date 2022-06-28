@@ -62,7 +62,6 @@ namespace RFC3091
 
                 var bytes = Encoding.ASCII.GetBytes(userInput);
                 udpClient.Send(bytes, bytes.Length, ipEndPoint);
-                
             } while (!tokenSource.Token.IsCancellationRequested);
         }
     }
