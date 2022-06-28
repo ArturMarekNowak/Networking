@@ -6,10 +6,8 @@ This repository contains implementations of simple networking examples.
 
 ## Table of contents
 * [General info](#general-info)
-* [Screenshots](#screenshots)
 * [Technologies](#technologies)
 * [Setup](#setup)
-* [Features](#features)
 * [Status](#status)
 * [Inspiration](#inspiration)
 
@@ -23,9 +21,7 @@ Thus far there are two projects implemented:
 4. Ping - console application which run is an equivalent to "ping <address>" command on windows OS. 
 5. NTP - implementation of simple NTP client. I was curious about the differences between the four times defined in [RFC 2030](https://datatracker.ietf.org/doc/html/rfc2030) which are reference, originate, receive and transmit timestamps and immediate call of *DateTime.Now*. This repository was review by [@peter-csala](https://github.com/peter-csala) (again :D) on CodeReview stack exchange: [NTP client displaying reference, originate, receive and transmit timestamps periodically with graceful shutdown in C#](https://codereview.stackexchange.com/questions/277266/ntp-client-displaying-reference-originate-receive-and-transmit-timestamps-peri)
 6. SMTP - implementation of simple SMTP client allowing to add multiple attachments. Based on: [The SMTP server requires a secure connection or the client was not authenticated. The server response was: 5.5.1 Authentication Required?](https://stackoverflow.com/questions/18503333/the-smtp-server-requires-a-secure-connection-or-the-client-was-not-authenticated/25215834#25215834) 
-
-## Screenshots
-There will be more here, stay tuned!
+7. RFC3091 - implementation of PI generator described in [RFC 3091](https://www.rfc-editor.org/rfc/rfc3091.html) document, but without the multicast service. 
 
 
 ## Technologies
@@ -36,20 +32,10 @@ There will be more here, stay tuned!
 ## Setup
 I am making sure that `dotnet build` is all that you need to make everything work. 
 
-## Code Examples
-There will be more here, stay tuned!
-
-
-## Features
-There will be more here, stay tuned!
-
-
-## To-do list:
-
-* RFC3091
 
 ## Status
 Project is: _in progress_
+
 
 ## Inspiration
 Network programming classes at AGH University of Science and Technology
