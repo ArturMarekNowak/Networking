@@ -34,7 +34,7 @@ I am making sure that `dotnet build` is all that you need to make everything wor
 
 
 ## Status
-Project is: _in progress_
+Project is: _finished_
 
 
 ## Inspiration
